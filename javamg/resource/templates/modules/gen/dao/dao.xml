@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>dao</name>
+	<filePath>src/main/java/${packageName}/mapper/dsno1/${moduleName}/${subModuleName}</filePath>
+	<fileName>${ClassName}Mapper.java</fileName>
+	<content><![CDATA[
+package ${packageName}.mapper.dsno1.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>;
+
+import ${packageName}.entity.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.${ClassName};
+import java.util.List;
+import org.fh.entity.Page;
+import org.apache.ibatis.annotations.Param;
+
+/**
+ * ${functionName}DAO接口
+ * 
+ * @author ${functionAuthor}
+ * @version ${functionVersion}
+ */
+public interface ${ClassName}Mapper {
+
+    /**
+	 * 通过Id查找${functionName}
+	 * 
+	 */
+	${ClassName} findById(String id);
+
+	/**
+	 * 通过条件查找${functionName}列表
+	 * 
+	 */
+	List<${ClassName}> select${ClassName}(${ClassName} ${className});
+	
+	/**
+	 * 获取${functionName}分页列表
+	 * 
+	 */
+	List<${ClassName}> listPage(Page<${ClassName}> page);
+
+	/**
+	 * 新增${functionName}
+	 * 
+	 */
+	int insert${ClassName}(${ClassName} ${className});
+
+	/**
+	 * 修改${functionName}
+	 * 
+	 */
+	int update${ClassName}(${ClassName} ${className});
+
+	/**
+	 * 删除${functionName}
+	 * 
+	 */
+	int del${ClassName}(@Param("id")String id, @Param("updateuserid")String updateuserid);
+	
+	/**
+	 * 批量删除${functionName}
+	 * 
+	 */
+	int del${ClassName}ByIds(@Param("ids") List<String> ids, @Param("updateuserid")String updateuserid);
+	
+}]]>
+	</content>
+</template>

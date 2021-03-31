@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>service</name>
+	<filePath>src/main/java/${packageName}/service/${moduleName}</filePath>
+	<fileName>${ClassName}Service.java</fileName>
+	<content><![CDATA[
+package ${packageName}.service.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>;
+
+import java.util.List;
+import org.fh.entity.Page;
+
+import ${packageName}.entity.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.${ClassName};
+
+/**
+ * ${functionName}Service接口
+ * 
+ * @author ${functionAuthor}
+ * @version ${functionVersion}
+ */
+public interface ${ClassName}Service {
+
+    /**
+	 * 通过Id查找${functionName}
+	 * 
+	 */
+	public ${ClassName} findById(String id);
+	
+	/**
+	 * 通过条件查找${functionName}列表
+	 * 
+	 */
+	List<${ClassName}> select${ClassName}(${ClassName} ${className});
+	
+	/**
+	 * 获取${functionName}分页列表
+	 * 
+	 */
+	public List<${ClassName}> listPage(Page<${ClassName}> page);
+	
+	/**
+	 * 新增${functionName}
+	 * 
+	 */
+	public int insert${ClassName}(${ClassName} ${className});
+	
+	/**
+	 * 修改${functionName}
+	 * 
+	 */
+	public int update${ClassName}(String id, ${ClassName} ${className});
+	
+	/**
+	 * 删除${functionName}
+	 * 
+	 */
+	public int del${ClassName}(String id, String updateuserid);
+	
+	/**
+	 * 批量删除${functionName}
+	 * 
+	 */
+	int del${ClassName}ByIds(List<String> ids, String updateuserid);
+}]]>
+	</content>
+</template>

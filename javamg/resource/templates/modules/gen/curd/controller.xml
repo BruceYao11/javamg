@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>controller</name>
+	<filePath>src/main/java/${packageName}/controller/${moduleName}/${subModuleName}</filePath>
+	<fileName>${ClassName}Controller.java</fileName>
+	<content><![CDATA[
+package ${packageName}.controller.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>;
+
+import java.util.List;
+
+import org.apache.shiro.authz.annotation.RequiresPermissions;
+import org.fh.controller.base.BaseController;
+import org.fh.entity.Page;
+import org.fh.entity.PageData;
+import org.fh.util.AjaxResult;
+import org.fh.util.Jurisdiction;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import org.fh.annotation.Log;
+
+import ${packageName}.entity.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.${ClassName};
+import ${packageName}.service.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.${ClassName}Service;
+
+/**
+ * ${functionName}Controller
+ * 
+ * @author ${functionAuthor}
+ * @version ${functionVersion}
+ */
+@Api(tags = "${functionName}接口")
+@Log(optCode=Const.LOG_OPERATION.XXXX)
+@RestController
+@RequestMapping(value = "/${urlPrefix}")
+public class ${ClassName}Controller extends BaseController {
+
+	@Autowired
+	private ${ClassName}Service ${className}Service;
+	
+	/**
+	 * 获取${functionName}分页列表
+	 * 
+	 */
+	@ApiOperation("获取${functionName}分页列表")
+	@Log(optType = "获取${functionName}分页列表")
+	@ApiImplicitParams({
+			@ApiImplicitParam(name = "page", value = "查找页", required = true, defaultValue = "1", dataType = "int"),
+			@ApiImplicitParam(name = "size", value = "查找条数", required = true, defaultValue = "10", dataType = "int") })
+	@RequiresPermissions("${permissionPrefix}:list")
+	@PostMapping("/listPage")
+	public AjaxResult<Page<${ClassName}>> listPage${ClassName}(@ApiParam(value = "${functionName}信息") @RequestBody ${ClassName} ${className},
+			@RequestParam(value = "page") int page, @RequestParam(value = "size") int size) {
+
+		PageData pd = new PageData(${className});
+		Page<${ClassName}> pageVo = new Page<>();
+		pageVo.setCurrentPage(page);
+		pageVo.setShowCount(size);
+		pageVo.setPd(pd);
+		List<${ClassName}> ${className}List = ${className}Service.listPage(pageVo);
+		pageVo.setValues(${className}List);
+		pageVo.setPd(null);
+
+		AjaxResult<Page<${ClassName}>> ajaxResult = new AjaxResult<Page<${ClassName}>>();
+		ajaxResult.success(pageVo);
+		
+		return ajaxResult;
+	}
+	
+	/**
+	 * 通过条件查找${functionName}列表
+	 * 
+	 */
+	@ApiOperation("通过条件查找${functionName}列表")
+	@Log(optType = "通过条件查找${functionName}列表")
+	@RequiresPermissions("${permissionPrefix}:list")
+	@PostMapping("/select${ClassName}")
+	public AjaxResult<List<${ClassName}>> select${ClassName}(@ApiParam(value = "${functionName}信息") @RequestBody ${ClassName} ${className}) {
+		
+		List<${ClassName}> ${className}List = ${className}Service.select${ClassName}(${className});
+		AjaxResult<List<${ClassName}>> ajaxResult = new AjaxResult<List<${ClassName}>>();
+		ajaxResult.success(${className}List);
+
+		return ajaxResult;
+	}
+	
+    /**
+	 * 通过Id查找${functionName}
+	 * 
+	 */
+	@ApiOperation("通过Id查找${functionName}")
+	@Log(optType = "通过Id查找${functionName}")
+	@ApiImplicitParam(name = "id", value = "${functionName}ID", required = true)
+	@RequiresPermissions("${permissionPrefix}:list")
+	@GetMapping("/get${ClassName}/{id}")
+    public AjaxResult<${ClassName}> get${ClassName}ById(@PathVariable("id") String id) throws Exception {
+		
+		${ClassName} ${className} = ${className}Service.findById(id);
+		AjaxResult<${ClassName}> ajaxResult = new AjaxResult<${ClassName}>();
+		ajaxResult.success(${className});
+		
+        return ajaxResult;
+    }
+	
+	/**
+	 * 新增${functionName}
+	 * 
+	 */
+	@ApiOperation("新增${functionName}")
+	@Log(optType = "新增${functionName}")
+	@RequiresPermissions("${permissionPrefix}:add")
+	@PostMapping("/add${ClassName}")
+	public AjaxResult<String> add${ClassName}(@ApiParam(value = "${functionName}信息") @Validated @RequestBody ${ClassName} ${className}) throws Exception {
+		String userId = Jurisdiction.getSessionUser().getUSER_ID();
+		${className}.setCreateuserid(userId);
+		${className}.setUpdateuserid(userId);
+		${className}.setId(get32UUID());
+		int i = ${className}Service.insert${ClassName}(${className});
+		AjaxResult<String> ajaxResult = new AjaxResult<String>();
+		ajaxResult.success(i + "");
+		return ajaxResult;
+	}
+	
+	
+	/**
+	 * 修改${functionName}
+	 * 
+	 */
+	@ApiOperation("修改${functionName}")
+	@Log(optType = "修改${functionName}")
+	@ApiImplicitParam(name = "id", value = "${functionName}ID", required = true)
+	@RequiresPermissions("${permissionPrefix}:edit")
+	@PutMapping("/change${ClassName}/{id}")
+	public AjaxResult<String> update${ClassName}(@PathVariable("id") String id, @ApiParam(value = "${functionName}信息") @Validated @RequestBody ${ClassName} ${className}) throws Exception {
+		${className}.setUpdateuserid(Jurisdiction.getSessionUser().getUSER_ID());
+		int i = ${className}Service.update${ClassName}(id, ${className});
+		AjaxResult<String> ajaxResult = new AjaxResult<String>();
+		ajaxResult.success(i + "");
+		return ajaxResult;
+	}
+	
+	/**
+	 * 删除${functionName}
+	 * 
+	 */
+	@ApiOperation("删除${functionName}")
+	@Log(optType = "删除${functionName}")
+	@ApiImplicitParam(name = "id", value = "${functionName}ID", required = true)
+	@RequiresPermissions("${className}:delete")
+	@DeleteMapping("/del${ClassName}/{id}")
+	public AjaxResult<String> del${ClassName}(@PathVariable("id") String id) throws Exception {
+		int i = ${className}Service.del${ClassName}(id, Jurisdiction.getSessionUser().getUSER_ID());
+		AjaxResult<String> ajaxResult = new AjaxResult<String>();
+		ajaxResult.success(i + "");
+		return ajaxResult;
+	}
+	
+	/**
+	 * 批量删除${functionName}
+	 * 
+	 */
+	@ApiOperation("批量删除${functionName}")
+	@Log(optType = "批量删除${functionName}")
+	@RequiresPermissions("${className}:delete")
+	@DeleteMapping("/del${ClassName}ByIds")
+	public AjaxResult<String> del${ClassName}ByIds(@ApiParam(value = "${functionName}列表", required = true) @RequestBody List<String> ids) throws Exception {
+		int i = ${className}Service.del${ClassName}ByIds(ids, Jurisdiction.getSessionUser().getUSER_ID());
+		AjaxResult<String> ajaxResult = new AjaxResult<String>();
+		ajaxResult.success(i + "");
+		return ajaxResult;
+	}
+	
+}]]>
+	</content>
+</template>

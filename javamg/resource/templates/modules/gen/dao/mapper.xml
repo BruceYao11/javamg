@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>mapper</name>
+	<filePath>src/main/resources/mybatis/dsno1/${moduleName}/${subModuleName}</filePath>
+	<fileName>${ClassName}Mapper.xml</fileName>
+	<content><![CDATA[
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="${packageName}.mapper.dsno1.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.${ClassName}Mapper">
+    
+    <resultMap id="${ClassName}ResultMap" type="${ClassName}">
+        <#list table.columnList as c>
+        <result property="${c.javaFieldId}" column="${c.name}"/>
+        </#list>
+    </resultMap>
+    
+    <#-- 输出字段列 -->
+	<sql id="${className}Columns">
+		<#assign columnField>
+			<#list table.columnList as c>
+		${table.name}.${c.name} AS "${c.javaFieldId}",
+			</#list>
+		</#assign>
+${columnField?substring(0, columnField?last_index_of(","))}
+	</sql>
+	
+	
+	<select id="findById" resultType="${ClassName}">
+		SELECT 
+			<include refid="${className}Columns"/>
+		FROM ${table.name}
+		WHERE ${table.name}.id = ${"#"}{id}
+	</select>
+	
+	<select id="select${ClassName}" resultType="${ClassName}">
+		SELECT 
+			<include refid="${className}Columns"/>
+		FROM ${table.name}
+		<where>
+			<#list table.columnList as c>
+				<#if c.name == "isactive">
+				AND	${table.name}.isactive = '1'
+				</#if>
+				<#if c.name == "isdel">
+				AND	${table.name}.isdel = '0'
+				</#if>
+				<#if (c.isQuery?? && c.isQuery == "1" && c.isNotBaseField) || (table.parentExists && table.parentTableFk == c.name)>
+					<#if c.queryType ?? && c.queryType == 'between'>
+			<if test="begin${c.simpleJavaField?cap_first} != null and end${c.simpleJavaField?cap_first} != null <#if c.simpleJavaField != c.javaFieldId>and begin${c.javaFieldId?cap_first} != null and end${c.javaFieldId?cap_first} != null </#if>and begin${c.javaFieldId?cap_first} != '' and end${c.javaFieldId?cap_first} != ''">
+					<#else>
+			<if test="${c.simpleJavaField} != null<#if c.simpleJavaField != c.javaFieldId> and ${c.javaFieldId} != null</#if> and ${c.javaFieldId} != ''">
+					</#if>
+					<#if c.queryType ?? && c.queryType == 'between'>
+				AND ${table.name}.${c.name} BETWEEN ${"#"}{begin${c.simpleJavaField?cap_first}} AND ${"#"}{end${c.simpleJavaField?cap_first}}
+					<#elseif c.queryType ?? && c.queryType == 'like'>
+				AND ${table.name}.${c.name} LIKE concat('%',${"#"}{${c.javaFieldId}},'%')
+					<#elseif c.queryType ?? && c.queryType == 'left_like'>
+				AND ${table.name}.${c.name} LIKE concat('%',${"#"}{${c.javaFieldId}})
+					<#elseif c.queryType ?? && c.queryType == 'right_like'>
+				AND ${table.name}.${c.name} LIKE concat(${"#"}{${c.javaFieldId}},'%')
+					<#else>
+				AND ${table.name}.${c.name} ${c.queryType} ${"#"}{${c.javaFieldId}}
+					</#if>
+			</if>
+				</#if>
+			</#list>
+		</where>
+	</select>
+	
+	<select id="listPage" resultType="${ClassName}">
+		SELECT 
+			<include refid="${className}Columns"/>
+		FROM ${table.name}
+		<where>
+			<#list table.columnList as c>
+				<#if c.name == "isactive">
+				AND	${table.name}.isactive = '1'
+				</#if>
+				<#if c.name == "isdel">
+				AND	${table.name}.isdel = '0'
+				</#if>
+				<#if (c.isQuery?? && c.isQuery == "1" && c.isNotBaseField) || (table.parentExists && table.parentTableFk == c.name)>
+					<#if c.queryType ?? && c.queryType == 'between'>
+			<if test="pd.begin${c.simpleJavaField?cap_first} != null and pd.end${c.simpleJavaField?cap_first} != null <#if c.simpleJavaField != c.javaFieldId>and pd.begin${c.javaFieldId?cap_first} != null and pd.end${c.javaFieldId?cap_first} != null </#if>and pd.begin${c.javaFieldId?cap_first} != '' and pd.end${c.javaFieldId?cap_first} != ''">
+					<#else>
+			<if test="pd.${c.simpleJavaField} != null<#if c.simpleJavaField != c.javaFieldId> and pd.${c.javaFieldId} != null</#if> and pd.${c.javaFieldId} != ''">
+					</#if>
+					<#if c.queryType ?? && c.queryType == 'between'>
+				AND ${table.name}.${c.name} BETWEEN ${"#"}{pd.begin${c.simpleJavaField?cap_first}} AND ${"#"}{pd.end${c.simpleJavaField?cap_first}}
+					<#elseif c.queryType ?? && c.queryType == 'like'>
+				AND ${table.name}.${c.name} LIKE concat('%',${"#"}{pd.${c.javaFieldId}},'%')
+					<#elseif c.queryType ?? && c.queryType == 'left_like'>
+				AND ${table.name}.${c.name} LIKE concat('%',${"#"}{pd.${c.javaFieldId}})
+					<#elseif c.queryType ?? && c.queryType == 'right_like'>
+				AND ${table.name}.${c.name} LIKE concat(${"#"}{pd.${c.javaFieldId}},'%')
+					<#else>
+				AND ${table.name}.${c.name} ${c.queryType} ${"#"}{pd.${c.javaFieldId}}
+					</#if>
+			</if>
+				</#if>
+			</#list>
+		</where>
+	</select>
+	
+	<insert id="insert${ClassName}">
+		INSERT INTO ${table.name}(
+		<#assign insertField>
+			<#list table.columnList as c>
+				<#if c.isInsert?? && c.isInsert == "1">
+			${c.name},
+				</#if>
+			</#list>
+		</#assign>
+${insertField?substring(0, insertField?last_index_of(","))}
+		) VALUES (
+		<#assign insertJavaField>
+			<#list table.columnList as c>
+				<#if c.isInsert?? && c.isInsert == "1" && c.isNotBaseField &&  c.name !="createtime" && c.name !="updatetime" && c.name !="isactive" && c.name !="isdel">
+			${"#"}{${c.javaFieldId}},
+				</#if>
+				<#if c.name == "createtime">
+			now(),
+				</#if>
+				<#if c.name == "updatetime">
+			now(),
+				</#if>
+				<#if c.name == "isactive">
+			'1',
+				</#if>
+				<#if c.name == "isdel">
+			'0',
+				</#if>
+			</#list>
+		</#assign>
+${insertJavaField?substring(0, insertJavaField?last_index_of(","))}
+		)
+	</insert>
+	
+	<update id="update${ClassName}">
+		UPDATE ${table.name} SET 	
+			<#assign updateField>		
+				<#list table.columnList as c>
+					<#if c.isEdit?? && c.isEdit == "1" && c.isNotBaseField  && c.name !="createuserid" && c.name !="createtime" && c.name !="updatetime" && c.name !="isactive" && c.name !="isdel">
+		<if test="${c.simpleJavaField} != null<#if c.simpleJavaField != c.javaFieldId> and ${c.javaFieldId} != null</#if>">
+			${c.name} = ${"#"}{${c.javaFieldId}},
+		</if>
+					</#if>
+					<#if c.name == "updatetime">
+			${c.name} = now(),
+					</#if>
+				</#list>
+			</#assign>
+${updateField?substring(0, updateField?last_index_of(","))}
+		WHERE id = ${"#"}{id}
+	</update>
+	
+	<update id="del${ClassName}">
+		UPDATE ${table.name} SET 
+		<#list table.columnList as c>
+			<#if c.name == "updateuserid">
+		UPDATEUSERID = ${"#"}{updateuserid},
+			</#if>
+			<#if c.name == "updatetime">
+		UPDATETIME = now(),
+			</#if>
+        </#list>
+        ISDEL = '1'
+		WHERE id = ${"#"}{id}
+	</update>
+	
+	<update id="del${ClassName}ByIds">
+		UPDATE ${table.name} SET 
+		<#list table.columnList as c>
+			<#if c.name == "updateuserid">
+		UPDATEUSERID = ${"#"}{updateuserid},
+			</#if>
+			<#if c.name == "updatetime">
+		UPDATETIME = now(),
+			</#if>
+        </#list>
+        ISDEL = '1'
+     	WHERE id in
+        <foreach item="item"  collection="ids" open="(" separator="," close=")">
+            ${"#"}{item}
+         </foreach>
+	</update>
+	
+</mapper>]]>
+	</content>
+</template>

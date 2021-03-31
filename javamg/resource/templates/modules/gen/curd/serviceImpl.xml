@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<name>service</name>
+	<filePath>src/main/java/${packageName}/service/${moduleName}/impl</filePath>
+	<fileName>${ClassName}ServiceImpl.java</fileName>
+	<content><![CDATA[
+package ${packageName}.service.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.impl;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.fh.entity.Page;
+
+import ${packageName}.service.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.${ClassName}Service;
+import ${packageName}.entity.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.${ClassName};
+import ${packageName}.mapper.dsno1.${moduleName}<#if subModuleName != "">.${subModuleName}</#if>.${ClassName}Mapper;
+
+/**
+ * ${functionName}ServiceImpl实现
+ * 
+ * @author ${functionAuthor}
+ * @version ${functionVersion}
+ */
+@Service
+public class ${ClassName}ServiceImpl implements ${ClassName}Service{
+
+	@Autowired
+	private ${ClassName}Mapper ${className}Mapper;
+	
+	/**
+	 * 通过Id查找${functionName}
+	 * 
+	 */
+	public ${ClassName} findById(String id) {
+		return ${className}Mapper.findById(id);
+	}
+	
+	/**
+	 * 通过条件查找${functionName}列表
+	 * 
+	 */
+	public List<${ClassName}> select${ClassName}(${ClassName} ${className}) {
+		return ${className}Mapper.select${ClassName}(${className});
+	}
+	
+	/**
+	 * 获取${functionName}分页列表
+	 * 
+	 */
+	public List<${ClassName}> listPage(Page<${ClassName}> page) {
+		return ${className}Mapper.listPage(page);
+	}
+	
+	/**
+	 * 新增${functionName}
+	 * 
+	 */
+	public int insert${ClassName}(${ClassName} ${className}) {
+		int ret = ${className}Mapper.insert${ClassName}(${className});
+		return ret;
+	}
+	
+	/**
+	 * 修改${functionName}
+	 * 
+	 */
+	public int update${ClassName}(String id, ${ClassName} ${className}) {
+		${className}.setId(id);
+		int ret = ${className}Mapper.update${ClassName}(${className});
+		return ret;
+	}
+	
+	/**
+	 * 删除${functionName}
+	 * 
+	 */
+	public int del${ClassName}(String id, String updateuserid) {
+		int ret = ${className}Mapper.del${ClassName}(id, updateuserid);
+		return ret;
+	}
+	
+	/**
+	 * 批量删除${functionName}
+	 * 
+	 */
+	public int del${ClassName}ByIds(List<String> ids, String updateuserid) {
+		int ret = ${className}Mapper.del${ClassName}ByIds(ids, updateuserid);
+		return ret;
+	}
+}]]>
+	</content>
+</template>
